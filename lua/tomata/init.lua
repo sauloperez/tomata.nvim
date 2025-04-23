@@ -1,43 +1,57 @@
 local notify = function(msg, level)
-  vim.notify(msg, level or vim.log.levels.INFO, { title = "🍅 Tomata" })
+	vim.notify(msg, level or vim.log.levels.INFO, { title = "🍅 Tomata" })
 end
 
-local M = { timer = nil }
+local config = {
+	duration = 25, -- in minutes
+}
 
-function M.start(duration) -- Duration in minutes
-  if M.timer then
-    M.stop()
-  end
+local M = {
+	timer = nil,
+}
 
-  duration = tonumber(duration) or 25 -- Default to 25 minutes
-  M.timer = vim.uv.new_timer()
+--@param opts table|nil Module options
+function M.setup(opts)
+	opts = opts or {}
+	print("opts", opts)
+	vim.tbl_deep_extend("force", config, opts)
+end
 
-  if not M.timer then
-    notify("Failed to create timer", vim.log.levels.ERROR)
-    return
-  end
+function M.start()
+	if M.timer then
+		M.stop()
+	end
 
-  M.timer:start(duration * 60 * 1000, 0, function()
-    notify("Time is up!")
-    M.stop()
-  end)
+	M.timer = vim.uv.new_timer()
 
-  notify("Starting pomodoro timer for " .. duration .. " minutes")
+	if not M.timer then
+		notify("Failed to create timer", vim.log.levels.ERROR)
+		return
+	end
+
+	notify("Starting pomodoro timer for " .. duration .. " minutes")
+
+	M.timer:start(config.duration * 1000, 0, function()
+		M.stop()
+		notify("Time is up!")
+	end)
 end
 
 function M.stop()
-  if M.timer then
-    M.timer:stop()
-    M.timer:close()
-    M.timer = nil
-  end
+	if M.timer then
+		M.timer:stop()
+		M.timer:close()
+		M.timer = nil
+	end
 end
 
 vim.api.nvim_create_user_command("Tomata", function(opts)
-  if opts.bang then
-    M.stop()
-    notify("Timer stopped")
-    return
-  end
-  M.start(opts.args)
-end, { nargs = "?", bang = true })
+	if opts.bang then
+		M.stop()
+		notify("Timer stopped")
+		return
+	end
+	M.start()
+end, { bang = true })
+
+return M
