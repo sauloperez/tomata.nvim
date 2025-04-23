@@ -2,13 +2,21 @@ local notify = function(msg, level)
 	vim.notify(msg, level or vim.log.levels.INFO, { title = "🍅 Tomata" })
 end
 
+local stop_timer = function(timer)
+	if timer then
+		timer:stop()
+		timer:close()
+		timer = nil
+	end
+end
+
 local M = {}
 
 local config = {
 	duration = 25, -- in minutes
 }
 
-local timer = nil
+local pomodoro_timer = nil
 
 --@param opts table|nil Module options
 function M.setup(opts)
@@ -19,13 +27,13 @@ function M.setup(opts)
 end
 
 function M.start()
-	if timer then
+	if pomodoro_timer then
 		M.stop()
 	end
 
-	timer = vim.uv.new_timer()
+	pomodoro_timer = vim.uv.new_timer()
 
-	if not timer then
+	if not pomodoro_timer then
 		notify("Failed to create timer", vim.log.levels.ERROR)
 		return
 	end
@@ -37,18 +45,14 @@ function M.start()
 
 	notify("Starting pomodoro timer for " .. config.duration .. " " .. unit)
 
-	timer:start(config.duration * 60 * 1000, 0, function()
+	pomodoro_timer:start(config.duration * 60 * 1000, 0, function()
 		M.stop()
 		notify("Time is up!")
 	end)
 end
 
 function M.stop()
-	if timer then
-		timer:stop()
-		timer:close()
-		timer = nil
-	end
+	stop_timer(pomodoro_timer)
 end
 
 function M.create_user_command()
