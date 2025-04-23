@@ -14,6 +14,8 @@ local timer = nil
 function M.setup(opts)
 	opts = opts or {}
 	config = vim.tbl_deep_extend("force", config, opts)
+
+	M.create_user_command()
 end
 
 function M.start()
@@ -49,13 +51,15 @@ function M.stop()
 	end
 end
 
-vim.api.nvim_create_user_command("Tomata", function(opts)
-	if opts.bang then
-		M.stop()
-		notify("Timer stopped")
-		return
-	end
-	M.start()
-end, { bang = true })
+function M.create_user_command()
+	vim.api.nvim_create_user_command("Tomata", function(opts)
+		if opts.bang then
+			M.stop()
+			notify("Timer stopped")
+			return
+		end
+		M.start()
+	end, { bang = true })
+end
 
 return M
