@@ -13,8 +13,7 @@ local timer = nil
 --@param opts table|nil Module options
 function M.setup(opts)
 	opts = opts or {}
-	print("opts", opts)
-	vim.tbl_deep_extend("force", config, opts)
+	config = vim.tbl_deep_extend("force", config, opts)
 end
 
 function M.start()
@@ -29,9 +28,14 @@ function M.start()
 		return
 	end
 
-	notify("Starting pomodoro timer for " .. duration .. " minutes")
+	local unit = "minutes"
+	if config.duration == 1 then
+		unit = "minute"
+	end
 
-	timer:start(config.duration * 1000, 0, function()
+	notify("Starting pomodoro timer for " .. config.duration .. " " .. unit)
+
+	timer:start(config.duration * 60 * 1000, 0, function()
 		M.stop()
 		notify("Time is up!")
 	end)
