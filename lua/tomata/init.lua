@@ -2,13 +2,13 @@ local notify = function(msg, level)
 	vim.notify(msg, level or vim.log.levels.INFO, { title = "🍅 Tomata" })
 end
 
+local M = {}
+
 local config = {
 	duration = 25, -- in minutes
 }
 
-local M = {
-	timer = nil,
-}
+local timer = nil
 
 --@param opts table|nil Module options
 function M.setup(opts)
@@ -18,30 +18,30 @@ function M.setup(opts)
 end
 
 function M.start()
-	if M.timer then
+	if timer then
 		M.stop()
 	end
 
-	M.timer = vim.uv.new_timer()
+	timer = vim.uv.new_timer()
 
-	if not M.timer then
+	if not timer then
 		notify("Failed to create timer", vim.log.levels.ERROR)
 		return
 	end
 
 	notify("Starting pomodoro timer for " .. duration .. " minutes")
 
-	M.timer:start(config.duration * 1000, 0, function()
+	timer:start(config.duration * 1000, 0, function()
 		M.stop()
 		notify("Time is up!")
 	end)
 end
 
 function M.stop()
-	if M.timer then
-		M.timer:stop()
-		M.timer:close()
-		M.timer = nil
+	if timer then
+		timer:stop()
+		timer:close()
+		timer = nil
 	end
 end
 
