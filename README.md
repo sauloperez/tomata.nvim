@@ -1,4 +1,4 @@
-# Tomata
+# Tomata 🍅
 
 A very simple Pomodoro timer plugin for Neovim.
 
