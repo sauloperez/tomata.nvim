@@ -5,7 +5,9 @@ end
 local stop_timer = function(timer)
   if timer then
     timer:stop()
-    timer:close()
+    if not timer:is_closing() then
+      timer:close()
+    end
     timer = nil
   end
 end
