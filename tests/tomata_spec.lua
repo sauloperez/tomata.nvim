@@ -139,6 +139,6 @@ describe("Tomata", function()
 
     eq(break_timer:is_active(), true)
     eq(break_timer:get_due_in(), 60 * 1000)
-    assert(find_message("Starting break timer for 1 minute"), "Expected start message not found")
+    assert(find_message("Starting break for 1 minute"), "Expected start message not found")
   end)
 end)
