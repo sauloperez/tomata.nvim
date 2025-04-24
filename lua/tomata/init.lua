@@ -30,9 +30,7 @@ end
 --@field end_msg string
 
 local M = {
-  pomodoro = {
-    timer = nil,
-  },
+  pomodoro = {},
 }
 
 local config = {
@@ -44,6 +42,13 @@ function M.setup(opts)
   opts = opts or {}
   config = vim.tbl_deep_extend("force", config, opts)
 
+  M.pomodoro = {
+    timer = nil,
+    duration = config.duration,
+    begin_msg = "Starting pomodoro timer for " .. config.duration .. " " .. unit(config.duration),
+    end_msg = "Time is up!",
+  }
+
   M.create_user_command()
 end
 
@@ -52,14 +57,9 @@ function M.start()
     stop_timer(M.pomodoro.timer)
   end
 
-  M.pomodoro = {
-    timer = vim.uv.new_timer(),
-    duration = config.duration,
-    begin_msg = "Starting pomodoro timer for " .. config.duration .. " " .. unit(config.duration),
-    end_msg = "Time is up!",
-  }
+  M.pomodoro.timer = vim.uv.new_timer()
 
-  if not M.pomodoro then
+  if not M.pomodoro.timer then
     notify("Failed to create timer", vim.log.levels.ERROR)
     return
   end
