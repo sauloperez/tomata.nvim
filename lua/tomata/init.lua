@@ -46,12 +46,13 @@ function M.start()
   notify("Starting pomodoro timer for " .. config.duration .. " " .. unit)
 
   M.pomodoro_timer:start(config.duration * 60 * 1000, 0, function()
-    M.stop()
+    stop_timer(M.pomodoro_timer)
     notify("Time is up!")
   end)
 end
 
 function M.stop()
+  notify("Timer stopped")
   stop_timer(M.pomodoro_timer)
 end
 
@@ -59,7 +60,6 @@ function M.create_user_command()
   vim.api.nvim_create_user_command("Tomata", function(opts)
     if opts.bang then
       M.stop()
-      notify("Timer stopped")
       return
     end
     M.start()

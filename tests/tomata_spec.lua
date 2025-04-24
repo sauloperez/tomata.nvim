@@ -21,4 +21,19 @@ describe("Tomata", function()
     eq(timer:is_active(), true)
     assert(find_message("Starting pomodoro timer for 1 minute"), "Expected start message not found")
   end)
+
+  it("can stop a pomodoro timer", function()
+    tomata.setup({ duration = 1 })
+    tomata.start()
+    tomata.stop()
+
+    local timer = tomata.pomodoro_timer
+    if not timer then
+      error("Timer is nil")
+    end
+
+    eq(timer:is_active(), false)
+    eq(timer:is_closing(), true)
+    assert(find_message("Timer stopped"), "Expected stop message not found")
+  end)
 end)
