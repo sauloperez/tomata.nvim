@@ -37,6 +37,34 @@ describe("Tomata", function()
   --   assert(find_message("Time is up!"), "Expected time is up message not found")
   -- end)
 
+  it("it handles 0 duration", function()
+    tomata.setup({ duration = 0 })
+    tomata.start()
+
+    local timer = tomata.pomodoro_timer
+    if not timer then
+      error("Timer is nil")
+    end
+
+    eq(timer:is_active(), true)
+    eq(timer:get_due_in(), 0)
+    assert(find_message("Starting pomodoro timer for 0 minute"), "Expected start message not found")
+  end)
+
+  it("it handles negative duration", function()
+    tomata.setup({ duration = -1 })
+    tomata.start()
+
+    local timer = tomata.pomodoro_timer
+    if not timer then
+      error("Timer is nil")
+    end
+
+    eq(timer:is_active(), true)
+    assert(timer:get_due_in() < 0)
+    assert(find_message("Starting pomodoro timer for -1 minute"), "Expected start message not found")
+  end)
+
   it("can restart a pomodoro timer after stopping", function()
     tomata.setup({ duration = 1 })
     tomata.start()
