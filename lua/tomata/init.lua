@@ -2,14 +2,8 @@ local notify = function(msg, level)
   vim.notify(msg, level or vim.log.levels.INFO, { title = "🍅 Tomata" })
 end
 
-local stop_timer = function(timer)
-  if timer then
-    timer:stop()
-    if not timer:is_closing() then
-      timer:close()
-    end
-    timer = nil
-  end
+local min_to_milis = function(min)
+  return min * 60 * 1000
 end
 
 local unit = function(time)
@@ -17,10 +11,6 @@ local unit = function(time)
     return "minute"
   end
   return "minutes"
-end
-
-local min_to_milis = function(min)
-  return min * 60 * 1000
 end
 
 --@class tomata.Timer
@@ -31,10 +21,12 @@ end
 
 local M = {
   pomodoro = {},
+  _break = {},
 }
 
 local config = {
   duration = 25, -- in minutes
+  break_duration = 5, -- in minutes
 }
 
 --@param opts table|nil Module options
@@ -48,33 +40,58 @@ function M.setup(opts)
     begin_msg = "Starting pomodoro timer for " .. config.duration .. " " .. unit(config.duration),
     end_msg = "Time is up!",
   }
+  M._break = {
+    timer = nil,
+    duration = config.break_duration,
+    begin_msg = "Starting break timer for " .. config.break_duration .. " " .. unit(config.break_duration),
+    end_msg = "Back to work!",
+  }
 
   M.create_user_command()
 end
 
-function M.start()
-  if M.pomodoro.timer then
-    stop_timer(M.pomodoro.timer)
+local stop_timer = function(tomata_timer)
+  local timer = tomata_timer.timer
+  if timer then
+    timer:stop()
+    if not timer:is_closing() then
+      timer:close()
+    end
+    timer = nil
+  end
+end
+
+local start_timer = function(timer)
+  if timer.timer then
+    stop_timer(timer.timer)
   end
 
-  M.pomodoro.timer = vim.uv.new_timer()
+  timer.timer = vim.uv.new_timer()
 
-  if not M.pomodoro.timer then
+  if not timer.timer then
     notify("Failed to create timer", vim.log.levels.ERROR)
     return
   end
 
-  notify(M.pomodoro.begin_msg)
+  notify(timer.begin_msg)
 
-  M.pomodoro.timer:start(min_to_milis(M.pomodoro.duration), 0, function()
-    stop_timer(M.pomodoro.timer)
-    notify(M.pomodoro.end_msg)
+  timer.timer:start(min_to_milis(timer.duration), 0, function()
+    stop_timer(timer.timer)
+    notify(timer.end_msg)
   end)
+end
+
+function M.start()
+  start_timer(M.pomodoro)
+end
+
+function M.start_break()
+  start_timer(M._break)
 end
 
 function M.stop()
   notify("Timer stopped")
-  stop_timer(M.pomodoro.timer)
+  stop_timer(M.pomodoro)
 end
 
 function M.create_user_command()

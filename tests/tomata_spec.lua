@@ -123,8 +123,22 @@ describe("Tomata", function()
     tomata.setup()
 
     local cmds = vim.api.nvim_get_commands({ builtin = false })
-    eq(cmds["Tomata"].bang, true)
-    eq(cmds["Tomata"].name, "Tomata")
-    eq(cmds["Tomata"].nargs, "0")
+    eq(cmds.Tomata.bang, true)
+    eq(cmds.Tomata.name, "Tomata")
+    eq(cmds.Tomata.nargs, "0")
+  end)
+
+  it("starts a break timer", function()
+    tomata.setup({ break_duration = 1 })
+    tomata.start_break()
+
+    local break_timer = tomata._break.timer
+    if not break_timer then
+      error("Timer is nil")
+    end
+
+    eq(break_timer:is_active(), true)
+    eq(break_timer:get_due_in(), 60 * 1000)
+    assert(find_message("Starting break timer for 1 minute"), "Expected start message not found")
   end)
 end)
