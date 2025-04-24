@@ -49,4 +49,13 @@ describe("Tomata", function()
     eq(timer:is_closing(), true)
     assert(find_message("Timer stopped"), "Expected stop message not found")
   end)
+
+  it("defines a user command", function()
+    tomata.setup()
+
+    local cmds = vim.api.nvim_get_commands({ builtin = false })
+    eq(cmds["Tomata"].bang, true)
+    eq(cmds["Tomata"].name, "Tomata")
+    eq(cmds["Tomata"].nargs, "0")
+  end)
 end)
