@@ -141,4 +141,21 @@ describe("Tomata", function()
     eq(break_timer:get_due_in(), 60 * 1000)
     assert(find_message("Starting break for 1 minute"), "Expected start message not found")
   end)
+
+  it("starts the break timer when the pomodoro timer is up", function()
+    tomata.setup({ duration = 1, break_duration = 1 })
+    tomata.start()
+
+    -- Simulate the timer is up and the callback is called
+    tomata.pomodoro.callback()
+
+    local break_timer = tomata._break.timer
+    if not break_timer then
+      error("Break timer is nil")
+    end
+
+    eq(break_timer:is_active(), true)
+    eq(break_timer:get_due_in(), 60 * 1000)
+    assert(find_message("Starting break for 1 minute"), "Expected start message not found")
+  end)
 end)
