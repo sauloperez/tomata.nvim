@@ -13,43 +13,6 @@ local unit = function(time)
   return "minutes"
 end
 
---@class tomata.Timer
---@field timer uv.Timer
---@field duration number
---@field begin_msg string
---@field end_msg string
-
-local M = {
-  pomodoro = {},
-  _break = {},
-}
-
-local config = {
-  duration = 25, -- in minutes
-  break_duration = 5, -- in minutes
-}
-
---@param opts table|nil Module options
-function M.setup(opts)
-  opts = opts or {}
-  config = vim.tbl_deep_extend("force", config, opts)
-
-  M.pomodoro = {
-    timer = nil,
-    duration = config.duration,
-    begin_msg = "Starting pomodoro timer for " .. config.duration .. " " .. unit(config.duration),
-    end_msg = "Time is up!",
-  }
-  M._break = {
-    timer = nil,
-    duration = config.break_duration,
-    begin_msg = "Starting break timer for " .. config.break_duration .. " " .. unit(config.break_duration),
-    end_msg = "Back to work!",
-  }
-
-  M.create_user_command()
-end
-
 local stop_timer = function(tomata_timer)
   local timer = tomata_timer.timer
   if timer then
@@ -61,6 +24,7 @@ local stop_timer = function(tomata_timer)
   end
 end
 
+--@param timer tomata.Timer the timer to start
 local start_timer = function(timer)
   if timer.timer then
     stop_timer(timer.timer)
@@ -78,7 +42,52 @@ local start_timer = function(timer)
   timer.timer:start(min_to_milis(timer.duration), 0, function()
     stop_timer(timer.timer)
     notify(timer.end_msg)
+
+    if timer.callback then
+      timer.callback()
+    end
   end)
+end
+
+--@class tomata.Timer
+--@field timer uv.Timer
+--@field duration number
+--@field begin_msg string
+--@field end_msg string
+--@field callback function|nil
+
+local M = {
+  pomodoro = {},
+  _break = {},
+}
+
+local config = {
+  duration = 25, -- in minutes
+  break_duration = 5, -- in minutes
+}
+
+--@param opts table|nil Module options
+function M.setup(opts)
+  opts = opts or {}
+  config = vim.tbl_deep_extend("force", config, opts)
+
+  M._break = {
+    timer = nil,
+    duration = config.break_duration,
+    begin_msg = "Starting break for " .. config.break_duration .. " " .. unit(config.break_duration),
+    end_msg = "Back to work!",
+  }
+  M.pomodoro = {
+    timer = nil,
+    duration = config.duration,
+    begin_msg = "Starting pomodoro timer for " .. config.duration .. " " .. unit(config.duration),
+    end_msg = "Time is up!",
+    callback = function()
+      start_timer(M._break)
+    end,
+  }
+
+  M.create_user_command()
 end
 
 function M.start()
