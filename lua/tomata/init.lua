@@ -19,6 +19,10 @@ local unit = function(time)
   return "minutes"
 end
 
+local min_to_milis = function(min)
+  return min * 60 * 1000
+end
+
 --@class tomata.Timer
 --@field timer uv.Timer
 --@field duration number
@@ -62,7 +66,7 @@ function M.start()
 
   notify(M.pomodoro.begin_msg)
 
-  M.pomodoro.timer:start(M.pomodoro.duration * 60 * 1000, 0, function()
+  M.pomodoro.timer:start(min_to_milis(M.pomodoro.duration), 0, function()
     stop_timer(M.pomodoro.timer)
     notify(M.pomodoro.end_msg)
   end)
