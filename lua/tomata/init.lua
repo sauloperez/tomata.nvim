@@ -12,8 +12,16 @@ local stop_timer = function(timer)
   end
 end
 
+--@class tomata.Timer
+--@field timer uv.Timer
+--@field duration number
+--@field begin_msg string
+--@field end_msg string
+
 local M = {
-  pomodoro_timer = nil,
+  pomodoro = {
+    timer = nil,
+  },
 }
 
 local config = {
@@ -29,15 +37,8 @@ function M.setup(opts)
 end
 
 function M.start()
-  if M.pomodoro_timer then
-    stop_timer(M.pomodoro_timer)
-  end
-
-  M.pomodoro_timer = vim.uv.new_timer()
-
-  if not M.pomodoro_timer then
-    notify("Failed to create timer", vim.log.levels.ERROR)
-    return
+  if M.pomodoro.timer then
+    stop_timer(M.pomodoro.timer)
   end
 
   local unit = "minutes"
@@ -45,17 +46,29 @@ function M.start()
     unit = "minute"
   end
 
-  notify("Starting pomodoro timer for " .. config.duration .. " " .. unit)
+  M.pomodoro = {
+    timer = vim.uv.new_timer(),
+    duration = config.duration,
+    begin_msg = "Starting pomodoro timer for " .. config.duration .. " " .. unit,
+    end_msg = "Time is up!",
+  }
 
-  M.pomodoro_timer:start(config.duration * 60 * 1000, 0, function()
-    stop_timer(M.pomodoro_timer)
-    notify("Time is up!")
+  if not M.pomodoro then
+    notify("Failed to create timer", vim.log.levels.ERROR)
+    return
+  end
+
+  notify(M.pomodoro.begin_msg)
+
+  M.pomodoro.timer:start(M.pomodoro.duration * 60 * 1000, 0, function()
+    stop_timer(M.pomodoro.timer)
+    notify(M.pomodoro.end_msg)
   end)
 end
 
 function M.stop()
   notify("Timer stopped")
-  stop_timer(M.pomodoro_timer)
+  stop_timer(M.pomodoro.timer)
 end
 
 function M.create_user_command()

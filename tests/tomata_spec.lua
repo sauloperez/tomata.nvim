@@ -13,7 +13,7 @@ describe("Tomata", function()
     tomata.setup({ duration = 1 })
     tomata.start()
 
-    local timer = tomata.pomodoro_timer
+    local timer = tomata.pomodoro.timer
     if not timer then
       error("Timer is nil")
     end
@@ -27,7 +27,7 @@ describe("Tomata", function()
   --   tomata.setup({ duration = 1 })
   --   tomata.start()
   --
-  --   local timer = tomata.pomodoro_timer
+  --   local timer = tomata.pomodoro.timer
   --   if not timer then
   --     error("Timer is nil")
   --   end
@@ -41,7 +41,7 @@ describe("Tomata", function()
     tomata.setup({ duration = 0 })
     tomata.start()
 
-    local timer = tomata.pomodoro_timer
+    local timer = tomata.pomodoro.timer
     if not timer then
       error("Timer is nil")
     end
@@ -55,7 +55,7 @@ describe("Tomata", function()
     tomata.setup({ duration = -1 })
     tomata.start()
 
-    local timer = tomata.pomodoro_timer
+    local timer = tomata.pomodoro.timer
     if not timer then
       error("Timer is nil")
     end
@@ -70,7 +70,7 @@ describe("Tomata", function()
     tomata.start()
     tomata.stop()
 
-    local timer = tomata.pomodoro_timer
+    local timer = tomata.pomodoro.timer
     if not timer then
       error("Timer is nil")
     end
@@ -81,7 +81,7 @@ describe("Tomata", function()
 
     tomata.start()
 
-    timer = tomata.pomodoro_timer
+    timer = tomata.pomodoro.timer
     if not timer then
       error("Timer is nil")
     end
@@ -95,7 +95,7 @@ describe("Tomata", function()
     tomata.setup({ duration = 2 })
     tomata.start()
 
-    local timer = tomata.pomodoro_timer
+    local timer = tomata.pomodoro.timer
     if not timer then
       error("Timer is nil")
     end
@@ -109,7 +109,7 @@ describe("Tomata", function()
     tomata.start()
     tomata.stop()
 
-    local timer = tomata.pomodoro_timer
+    local timer = tomata.pomodoro.timer
     if not timer then
       error("Timer is nil")
     end
