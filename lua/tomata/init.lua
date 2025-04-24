@@ -10,13 +10,13 @@ local stop_timer = function(timer)
   end
 end
 
-local M = {}
+local M = {
+  pomodoro_timer = nil,
+}
 
 local config = {
   duration = 25, -- in minutes
 }
-
-local pomodoro_timer = nil
 
 --@param opts table|nil Module options
 function M.setup(opts)
@@ -27,13 +27,13 @@ function M.setup(opts)
 end
 
 function M.start()
-  if pomodoro_timer then
-    M.stop()
+  if M.pomodoro_timer then
+    stop_timer(M.pomodoro_timer)
   end
 
-  pomodoro_timer = vim.uv.new_timer()
+  M.pomodoro_timer = vim.uv.new_timer()
 
-  if not pomodoro_timer then
+  if not M.pomodoro_timer then
     notify("Failed to create timer", vim.log.levels.ERROR)
     return
   end
@@ -45,14 +45,14 @@ function M.start()
 
   notify("Starting pomodoro timer for " .. config.duration .. " " .. unit)
 
-  pomodoro_timer:start(config.duration * 60 * 1000, 0, function()
+  M.pomodoro_timer:start(config.duration * 60 * 1000, 0, function()
     M.stop()
     notify("Time is up!")
   end)
 end
 
 function M.stop()
-  stop_timer(pomodoro_timer)
+  stop_timer(M.pomodoro_timer)
 end
 
 function M.create_user_command()
