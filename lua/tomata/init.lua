@@ -12,6 +12,13 @@ local stop_timer = function(timer)
   end
 end
 
+local unit = function(time)
+  if time == 1 then
+    return "minute"
+  end
+  return "minutes"
+end
+
 --@class tomata.Timer
 --@field timer uv.Timer
 --@field duration number
@@ -41,15 +48,10 @@ function M.start()
     stop_timer(M.pomodoro.timer)
   end
 
-  local unit = "minutes"
-  if config.duration == 1 then
-    unit = "minute"
-  end
-
   M.pomodoro = {
     timer = vim.uv.new_timer(),
     duration = config.duration,
-    begin_msg = "Starting pomodoro timer for " .. config.duration .. " " .. unit,
+    begin_msg = "Starting pomodoro timer for " .. config.duration .. " " .. unit(config.duration),
     end_msg = "Time is up!",
   }
 
