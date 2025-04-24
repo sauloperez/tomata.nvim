@@ -6,7 +6,7 @@ A very simple Pomodoro timer plugin for Neovim.
 
 - Start a Pomodoro timer with `:Tomata`
 - Stop the timer with `:Tomata!`
-- Configurable Pomodoro duration
+- Configurable Pomodoro and break durations
 
 ## Installation
 
@@ -32,10 +32,11 @@ use 'sauloperez/tomata.nvim'
 
 ## Configuration
 
-You can configure the plugin by passing options to the `setup` function:
+You can configure the plugin by passing options to the `setup` function. Both Pomodoro and break durations can be set:
 
 ```lua
 require('tomata').setup({
     duration = 30, -- Set Pomodoro duration to 30 minutes
+    break_duration = 10, -- Set break duration to 10 minutes
 })
 ```
