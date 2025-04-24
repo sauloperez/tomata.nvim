@@ -19,6 +19,7 @@ describe("Tomata", function()
     end
 
     eq(timer:is_active(), true)
+    eq(timer:get_due_in(), 60 * 1000)
     assert(find_message("Starting pomodoro timer for 1 minute"), "Expected start message not found")
   end)
 
